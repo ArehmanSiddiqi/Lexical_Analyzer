@@ -7,15 +7,17 @@
 
 using namespace std;
 
+#define DATA 20
+
 int isKeyword(char buffer[]){
-	char keywords[32][9] = { "auto", "break", "case", "char", "const", "continue", "default",
+	char keywords[35][9] = { "auto", "break", "case", "char", "const", "continue", "default",
 		"do", "double", "else", "enum", "extern", "float", "for", "goto",
 		"if", "int", "long", "register", "return", "short", "signed",
 		"sizeof", "static", "struct", "switch", "typedef", "union",
-		"unsigned", "void", "volatile", "while" };
+		"unsigned", "void", "volatile", "while", "system", "pause", "cout" };
 	int i, flag = 0;
 
-	for (i = 0; i < 32; ++i){
+	for (i = 0; i < 35; ++i){
 		if (strcmp(keywords[i], buffer) == 0){
 			flag = 1;
 			break;
@@ -30,7 +32,7 @@ int isNumber(char buffer[])
 	int dotFlag = 0;
 
 	int string_len = strlen(buffer);
-	for (int i = 0; i < string_len; ++i) {	// checking if char array is number
+	for (int i = 0; i < string_len; ++i) {	
 		if (buffer[i] == '.') dotFlag = dotFlag + 1;
 		if (dotFlag >= 2) return 0;
 		if (!(isdigit(buffer[i]) || (buffer[i] == '.')))
@@ -43,9 +45,12 @@ int isNumber(char buffer[])
 
 
 int main(){
-	char ch, buffer[15], operators[] = "+-*/%=", braket[] = "{}[]()", terminator = ';';
+	char ch, buffer[15];
 	ifstream fin("program.txt");
-	int i, j = 0;
+	int j = 0, repeat = 0;
+	int id = 0, key = 0, con = 0, ope = 0;
+
+	string ident[DATA], keyword[DATA], constant[DATA], op[DATA];
 
 	if (!fin.is_open()){
 		cout << "error while opening the file\n";
@@ -54,17 +59,7 @@ int main(){
 
 	while (!fin.eof()){
 		ch = fin.get();
-
-		if (ch == terminator)
-		{
-			cout << ch << " is terminator\n";
-		}
-
-		for (i = 0; i < 6; ++i){    // 6 operators in string match with each one
-			if (ch == operators[i])
-				cout << ch << " is operator\n";
-		}
-	
+		repeat = 0;
 
 		if (isalnum(ch)||(ch=='.')){
 			buffer[j++] = ch;
@@ -74,17 +69,70 @@ int main(){
 			j = 0;
 
 			if (isKeyword(buffer) == 1)
+			{
 				cout << buffer << " is keyword\n";
-			else if (isNumber(buffer) == 1)
-				cout << buffer << " is Constant\n";
-			else if (!isdigit(buffer[0]))
-				cout << buffer << " is indentifier\n";
-			else
-				cout << "Unknown"
+				for (int i = 0; i <= key; i++)
+				{
+					if (keyword[i] == buffer)
+						repeat = 1;
+				}
+	
+				if (repeat == 0)
+				{
+					keyword[key] = buffer;
+					key++;
+				}
 
+			}
+			else if (isNumber(buffer) == 1)
+			{
+				cout << buffer << " is Constant\n";
+				constant[con] = buffer;
+				con++;
+			}
+			else if (!isdigit(buffer[0]))
+			{
+				cout << buffer << " is indentifier\n";
+
+				for (int i = 0; i <= id; i++)
+				{
+					if (ident[i] == buffer)
+						repeat = 1;
+				}
+
+				if (repeat == 0)
+				{
+					ident[id] = buffer;
+					id++;
+				}
+			}
+			else
+				cout << buffer << "Unknown" << endl;
 		}
 
 	}
+
+	cout << "\n\n\n\n\n";
+
+	cout << ":::IDENTIFIERS:::" << endl;
+	for (int i = 0; i < id; i++)
+	{
+		cout << i << " = " << ident[i] << endl;
+	}
+
+	cout << ":::CONSTANTS:::" << endl;
+	for (int i = 0; i < con; i++)
+	{
+		cout << i << " = " << constant[i] << endl;
+	}
+
+	cout << ":::KEYWORDS:::" << endl;
+	for (int i = 0; i < key; i++)
+	{
+		cout << i << " = " << keyword[i] << endl;
+	}
+
+	cout << "\n\n\n\n\n";
 
 	fin.close();
 
